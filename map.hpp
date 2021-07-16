@@ -1,3 +1,4 @@
+#pragma once
 #include "utils.hpp"
 
 	template < class Key,                                     // map::key_type
@@ -60,6 +61,6 @@
 				const_iterator lower_bound (const key_type& k) const;
 				iterator upper_bound (const key_type& k);
 				const_iterator upper_bound (const key_type& k) const;
-				pair<const_iterator,const_iterator> equal_range (const key_type& k) const; 
+				pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
 				pair<iterator,iterator> equal_range (const key_type& k);
 			}

@@ -1,3 +1,5 @@
+#pragma once
+#include <cstdlib>
 namespace ft{
 template <class T>
 	struct less
@@ -5,9 +7,9 @@ template <class T>
 		typedef T       first_argument_type;
 		typedef T       second_argument_type;
 		typedef bool    result_type;
-		
+
 		bool operator() (const T& x, const T& y) const {return x<y;}
-		
+
 	};
 	template <bool B>
 	struct enable_if {};
@@ -20,7 +22,7 @@ template <class T>
 
 	template <>
 	struct is_integral<bool> { static const bool value = true; };
-		
+
 	template <>
 	struct is_integral<char> { static const bool value = true; };
 
@@ -78,4 +80,27 @@ template <class T>
 		a = b;
 		b = tmp;
 	}
+	template <class Iterator>	struct iterator_traits {
+		typedef typename Iterator::difference_type		difference_type;
+		typedef typename Iterator::value_type			value_type;
+		typedef typename Iterator::pointer				pointer;
+		typedef typename Iterator::reference			reference;
+		typedef typename Iterator::iterator_category	iterator_category;
+	};
+
+	template <class T>	struct iterator_traits<T*> {
+		typedef std::ptrdiff_t	difference_type;
+		typedef T				value_type;
+		typedef T*				pointer;
+		typedef T&				reference;
+		typedef std::random_access_iterator_tag	iterator_category;
+	};
+
+	template <class T>	struct iterator_traits<const T*> {
+		typedef std::ptrdiff_t	difference_type;
+		typedef T				value_type;
+		typedef const T*		pointer;
+		typedef const T&		reference;
+		typedef std::random_access_iterator_tag	iterator_category;
+	};
 }

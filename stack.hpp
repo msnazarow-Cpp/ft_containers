@@ -1,5 +1,5 @@
-#include "vector.hpp"
 #pragma once
+#include "vector.hpp"
 namespace ft
 {
 	template <class T, class Container = ft::vector<T> > class stack
@@ -27,7 +27,7 @@ namespace ft
 
 			template <class Tn, class ContainerN>
 				friend bool operator!= (const ft::stack<Tn, ContainerN>& lhs, const ft::stack<Tn, ContainerN>& rhs);
-			
+
 			template <class Tn, class ContainerN>
 				friend bool operator< (const ft::stack<Tn, ContainerN>& lhs, const ft::stack<Tn, ContainerN>& rhs);
 
@@ -54,11 +54,11 @@ namespace ft
 		{ return (lhs.ct < rhs.ct); }
 	template <class T, class Container>
 		bool operator<= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
-		{ return (lhs.ct <= rhs.ct); }	
+		{ return (lhs.ct <= rhs.ct); }
 	template <class T, class Container>
 		bool operator> (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
 		{ return (lhs.ct > rhs.ct); }
 	template <class T, class Container>
 		bool operator>= (const ft::stack<T, Container>& lhs, const ft::stack<T, Container>& rhs)
-		{ return (lhs.ct >= rhs.ct); }	
+		{ return (lhs.ct >= rhs.ct); }
 }

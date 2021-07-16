@@ -1,3 +1,4 @@
+#pragma once
 namespace ft
 {
 template < class iterator >
@@ -13,7 +14,7 @@ class	reverse_iterator
 
 	private:
 		iterator_type	_it;
-	
+
 	public:
 		reverse_iterator(): _it() {}
 		reverse_iterator(const iterator_type & it) :  _it(it) {}
@@ -36,11 +37,11 @@ class	reverse_iterator
 		reference			operator*()								const { return (*(this->_it - 1)); }
 		pointer				operator->()							const	{ return (&(this->operator*())); }
 		reference			operator[](difference_type n)				const	{ return *(this->_it - n - 1); }
-		
+
 
 	};
 	template <class Iterator>
-		reverse_iterator<Iterator> operator+ (		
+		reverse_iterator<Iterator> operator+ (
 			typename reverse_iterator<Iterator>::difference_type n,
 			const reverse_iterator<Iterator>& rev_it) { return (rev_it + n); }
 

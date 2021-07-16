@@ -1,3 +1,4 @@
+#pragma once
 #include "utils.hpp"
 #include "reverse_iterator.hpp"
 #include <cstdlib>
@@ -78,7 +79,7 @@ namespace ft{
 				const_iterator lower_bound (const key_type& k) const;
 				iterator upper_bound (const key_type& k);
 				const_iterator upper_bound (const key_type& k) const;
-				pair<const_iterator,const_iterator> equal_range (const key_type& k) const; 
+				pair<const_iterator,const_iterator> equal_range (const key_type& k) const;
 				pair<iterator,iterator> equal_range (const key_type& k);
 			};
 

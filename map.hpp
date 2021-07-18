@@ -84,7 +84,8 @@ namespace ft{
 					bool elementInserted = size() > length_before;
 					return ft::make_pair<iterator, bool>(it, elementInserted);
 				}
-				iterator insert (iterator position, const value_type& val){ return _tree.insert(position, val);}
+				iterator insert (iterator position, const value_type& val)
+				{ return _tree.insert(position, val);}
 				template <class InputIterator>
 				void insert (InputIterator first, InputIterator last){ _tree.insert(first, last);}
 				void erase (iterator position){ _tree.erase(position);}

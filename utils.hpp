@@ -74,6 +74,18 @@ template <class T>
 		}
 		return (first1 == last1) && (first2 != last2);
 	}
+
+	template <class Ite1, class Ite2>
+	bool	equal(Ite1 first1, Ite1 last1, Ite2 first2)
+	{
+		while (first1 != last1)
+		{
+			if (*first1 != *first2)
+				return false;
+			++first1; ++first2;
+		}
+		return true;
+	}
 	template <typename U>
 	void swap(U& a, U&b)
 	{

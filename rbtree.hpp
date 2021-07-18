@@ -45,11 +45,12 @@ namespace ft
 			return (*this);}
 	};
 
-	template <class T, class Compare, class Alloc = std::allocator<T> >
+	template <class T, class Compare, class Pointer = T*, class Reference = T&, class Alloc = std::allocator<T> >
 	class rbtree_iterator
 	{
 	public:
 		typedef ft::node<T> node;
+		typedef T	value_type;
 		typedef Alloc allocator_type;
 		typedef typename iterator_traits<T>::size_type size_type;
 		typedef typename iterator_traits<T>::difference_type difference_type;
@@ -576,14 +577,14 @@ namespace ft
 							s = x->parent->right;
 						}
 
-						if (s->left->color == black && s->right->color == black)
+						if (s->left && s->right && s->left->color == black && s->right->color == black)
 						{
 							s->color = red;
 							x = x->parent;
 						}
 						else
 						{
-							if (s->right->color == black)
+							if (s->right && s->right->color == black)
 							{
 								s->left->color = black;
 								s->color = red;

@@ -46,64 +46,107 @@ namespace ft{
 
 			private:
 				key_compare comp;
-				ft::rbtree<ft::pair<const Key, T>, value_compare> tree;
+				ft::rbtree<ft::pair<const Key, T>, value_compare> _tree;
 				allocator_type _alloc;
 				static bool keys_equal(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2) {Compare comp; return !(comp(p1.first, p2.first) || comp(p2.first, p1.first));}
 				static bool key_gr_eq(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2) {Compare comp; return (!comp(p2.first, p1.first));}
 				static bool key_sm(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2 ){Compare comp; return comp(p1.first, p2.first);}
 				
 			public:
-				explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()):comp(comp), tree(value_compare(comp)), _alloc(alloc){}
+				explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()):comp(comp), _tree(value_compare(comp)), _alloc(alloc){}
 				template <class InputIterator>
-				map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()): comp(comp), tree(first, last, value_compare(comp)), _alloc(alloc){}
-				map (const map& x): tree(x.tree){}
+				map (InputIterator first, InputIterator last, const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()): comp(comp), _tree(first, last, value_compare(comp)), _alloc(alloc){}
+				map (const map& x): _tree(x._tree){}
 				~map(){}
 				map& operator= (const map& x){
-					tree.operator=(x.tree);
+					_tree.operator=(x._tree);
 					return (*this);
 				}
-				iterator begin() {return tree.begin();}
-				const_iterator begin() const {return tree.begin();}
-				iterator end() {return tree.end();}
-				const_iterator end() const {return tree.end();}
-				reverse_iterator rbegin() {return tree.rbegin();}
-				const_reverse_iterator rbegin() const {return tree.rbegin();}
-				reverse_iterator rend() {return tree.rend();}
-				const_reverse_iterator rend() const {return tree.rend();}
-				bool empty() const {return tree.empty();}
-				size_type size() const {return tree.size();}
+				iterator begin() {return _tree.begin();}
+				const_iterator begin() const {return _tree.begin();}
+				iterator end() {return _tree.end();}
+				const_iterator end() const {return _tree.end();}
+				reverse_iterator rbegin() {return _tree.rbegin();}
+				const_reverse_iterator rbegin() const {return _tree.rbegin();}
+				reverse_iterator rend() {return _tree.rend();}
+				const_reverse_iterator rend() const {return _tree.rend();}
+				bool empty() const {return _tree.empty();}
+				size_type size() const {return _tree.size();}
 				size_type max_size() const {
-					return std::numeric_limits<difference_type>::max() / (sizeof(ft::node<value_type>) );
-					return tree.max_size();
+					//return std::numeric_limits<difference_type>::max() / (sizeof(ft::node<value_type>) );
+					return _tree.max_size();
 					}
 				mapped_type &operator[] (const key_type& k) { return ((insert(ft::make_pair<key_type, mapped_type>(k, mapped_type()))).first).base()->data.second;}
 				pair<iterator,bool> insert (const value_type& val)
 				{
 					size_type length_before = size();
-					iterator it = tree.insert(val);
+					iterator it = _tree.insert(val);
 					bool elementInserted = size() > length_before;
 					return ft::make_pair<iterator, bool>(it, elementInserted);
 				}
 				iterator insert (iterator position, const value_type& val)
-				{ return tree.insert(position, val);}
+				{ return _tree.insert(position, val);}
 				template <class InputIterator>
-				void insert (InputIterator first, InputIterator last){ tree.insert(first, last);}
-				void erase (iterator position){ tree.erase(position);}
-				size_type erase (const key_type& k) {return tree.eraseIf(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				void erase (iterator first, iterator last) {tree.erase(first, last);}
-				void swap (map& x) {tree.swap(x.tree);}
-				void clear() {tree.clear();}
+				void insert (InputIterator first, InputIterator last){ _tree.insert(first, last);}
+				void erase (iterator position){ _tree.erase(position);}
+				size_type erase (const key_type& k) {return _tree.eraseIf(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				void erase (iterator first, iterator last) {_tree.erase(first, last);}
+				void swap (map& x) {_tree.swap(x._tree);}
+				void clear() {_tree.clear();}
 				key_compare key_comp() const {return key_compare();}
 				value_compare value_comp() const {return value_compare(Compare());}
-				iterator find (const key_type& k) {return tree.find(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				const_iterator find (const key_type& k) const {return tree.find(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				size_type count (const key_type& k) const {return tree.countIf(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				iterator lower_bound (const key_type& k) {return tree.find(key_gr_eq, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				const_iterator lower_bound (const key_type& k) const {return tree.find(key_gr_eq, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				iterator upper_bound (const key_type& k) {return tree.find(key_sm, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
-				const_iterator upper_bound (const key_type& k) const {return tree.find(key_sm, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				iterator find (const key_type& k) {return _tree.find(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				const_iterator find (const key_type& k) const {return _tree.find(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				size_type count (const key_type& k) const {return _tree.countIf(keys_equal, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				iterator lower_bound (const key_type& k) {return _tree.find(key_gr_eq, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				const_iterator lower_bound (const key_type& k) const {return _tree.find(key_gr_eq, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				iterator upper_bound (const key_type& k) {return _tree.find(key_sm, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
+				const_iterator upper_bound (const key_type& k) const {return _tree.find(key_sm, ft::make_pair<key_type, mapped_type>(k, mapped_type()));}
 				pair<const_iterator,const_iterator> equal_range (const key_type& k) const {return ft::make_pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k));}
 				pair<iterator,iterator> equal_range (const key_type& k) {return ft::make_pair<iterator, iterator>(lower_bound(k), upper_bound(k));}
 			};
+			template <class Key, class T, class Compare, class Alloc>
+bool	operator==(const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	if (lhs.size() != rhs.size())
+		return false;
+	return (ft::equal(lhs.begin(), lhs.end(), rhs.begin()));
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool	operator!=(const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	return !(lhs == rhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool	operator< (const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	return ft::lexicographical_compare(lhs.begin(), lhs.end(), rhs.begin(), rhs.end());
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool	operator<=(const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	return !(rhs < lhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool	operator> (const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	return (rhs < lhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+bool	operator>=(const map<Key, T, Compare, Alloc> &lhs,
+					const map<Key, T, Compare, Alloc> &rhs) {
+	return !(lhs < rhs);
+}
+
+template <class Key, class T, class Compare, class Alloc>
+void	swap(map<Key, T, Compare, Alloc> &x, map<Key, T, Compare, Alloc> &y) {
+	x.swap(y);
+}
+
 
 }

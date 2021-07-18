@@ -3,7 +3,7 @@
 #include "utils.hpp"
 namespace ft
 {
-	template <class T, class Category = std::random_access_iterator_tag, class allocator_type = std::allocator<T> >
+	template <class T, class Pointer = T*, class Reference = T&, class Category = std::random_access_iterator_tag, class allocator_type = std::allocator<T> >
 	class vector_iterator{
 		public:
 		typedef typename ft::iterator_traits<T>::value_type			value_type;

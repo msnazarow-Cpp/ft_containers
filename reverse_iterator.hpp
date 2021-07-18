@@ -34,9 +34,9 @@ class	reverse_iterator
 		bool				operator==(reverse_iterator const & rhs)	const	{ return (this->_it == rhs._it); }
 		bool				operator!=(reverse_iterator const & rhs)	const	{ return (this->_it != rhs._it); }
 
-		reference			operator*()								const { return (*(this->_it - 1)); }
+		reference			operator*()								const {iterator tmp = _it; return *--tmp;}
 		pointer				operator->()							const	{ return (&(this->operator*())); }
-		reference			operator[](difference_type n)				const	{ return *(this->_it - n - 1); }
+		reference			operator[](difference_type n)				const	{ return base()[-n-1]; }
 
 
 	};

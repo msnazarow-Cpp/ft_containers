@@ -43,9 +43,11 @@ namespace ft
 			data = rhs.data;
 			color = rhs.color;
 			return (*this);}
+		operator node<const T>() {
+			return node<const T>((const T)data,color,left,right,parent);}
 	};
 
-	template <class T, class Compare, class Pointer = T*, class Reference = T&, class Alloc = std::allocator<T> >
+	template <class T, class Compare, class Alloc = std::allocator<T> >
 	class rbtree_iterator
 	{
 	public:
@@ -55,7 +57,7 @@ namespace ft
 		typedef typename iterator_traits<T>::size_type size_type;
 		typedef typename iterator_traits<T>::difference_type difference_type;
 		typedef typename iterator_traits<T>::pointer pointer;
-		typedef typename iterator_traits<const T>::pointer const_pointer;
+		typedef typename iterator_traits<T>::const_pointer const_pointer;
 		typedef typename iterator_traits<T>::reference reference;
 		typedef typename iterator_traits<T>::const_reference const_reference;
 		typedef std::bidirectional_iterator_tag iterator_category;
@@ -145,7 +147,7 @@ namespace ft
 
 		bool operator==(const rbtree_iterator &rhs) const {return this->ptr == rhs.ptr;}
 		bool operator!=(const rbtree_iterator &rhs) const {return this->ptr != rhs.ptr;}
-		operator rbtree_iterator<const T, Compare>() const {
+		operator rbtree_iterator<const T, Compare>() {
 			return rbtree_iterator<const T, Compare>(ptr, tNull, min, max);}
 
 	};
@@ -577,14 +579,14 @@ namespace ft
 							s = x->parent->right;
 						}
 
-						if (s->left && s->right && s->left->color == black && s->right->color == black)
+						if (s->left->color == black && s->right->color == black)
 						{
 							s->color = red;
 							x = x->parent;
 						}
 						else
 						{
-							if (s->right && s->right->color == black)
+							if (s->right->color == black)
 							{
 								s->left->color = black;
 								s->color = red;

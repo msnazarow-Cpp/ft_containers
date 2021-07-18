@@ -150,7 +150,7 @@ namespace ft
 	template <class T>
 	class rbtree_const_iterator {
 	public:
-		typedef const ft::node<T> node;
+		typedef ft::node<T> node;
 		typedef const T	value_type;
 		typedef typename iterator_traits<T>::size_type size_type;
 		typedef typename iterator_traits<T>::difference_type difference_type;
@@ -259,7 +259,7 @@ namespace ft
 		typedef typename allocator_type::const_pointer		const_pointer;
 		typedef typename allocator_type::difference_type	difference_type;
 		typedef typename allocator_type::size_type			size_type;
-		typedef node<const T> *const_nodePtr;
+		typedef node<T>* const_nodePtr;
 		typedef rbtree_iterator<T> iterator;
 		typedef rbtree_const_iterator<T> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;

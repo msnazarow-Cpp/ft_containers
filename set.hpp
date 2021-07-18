@@ -95,7 +95,7 @@ namespace ft
 
 		void erase(iterator first, iterator last){_tree.erase(first, last);}
 
-		void swap(_Self &x){ft::swap(_tree, x._tree);}
+		void swap(_Self &x){_tree.swap(x._tree);}
 		size_type count (const key_type& k) const {return _tree.countIf(keys_equal, k);}
 		iterator find (const key_type& k) {return _tree.find(keys_equal, k);}
 		const_iterator find (const key_type& k) const {return _tree.find(keys_equal, k);}

@@ -45,19 +45,16 @@ namespace ft
 			return (*this);}
 	};
 
-	template <class T, class Compare, class Pointer = T*, class Reference = T&, class Alloc = std::allocator<T> >
+	template <class T>
 	class rbtree_iterator
 	{
 	public:
 		typedef ft::node<T> node;
 		typedef T	value_type;
-		typedef Alloc allocator_type;
 		typedef typename iterator_traits<T>::size_type size_type;
 		typedef typename iterator_traits<T>::difference_type difference_type;
 		typedef typename iterator_traits<T>::pointer pointer;
-		typedef typename iterator_traits<const T>::pointer const_pointer;
 		typedef typename iterator_traits<T>::reference reference;
-		typedef typename iterator_traits<T>::const_reference const_reference;
 		typedef std::bidirectional_iterator_tag iterator_category;
 	private:
 		node *tNull;
@@ -77,11 +74,14 @@ namespace ft
 			max = rhs.max;
 			return *this;
 		}
+
 		node *base() const {return ptr;}
-		reference operator*(void) {return this->ptr->data;}
-		const_reference operator*(void) const {return this->ptr->data;}
-		const_pointer operator->(void) const {return &this->ptr->data;}
-		pointer operator->(void) {return &this->ptr->data;}
+		node *maxptr() const {return max;}
+		node *minptr() const {return min;}
+		node *null() const {return tNull;}
+
+		reference operator*(void) const {return this->ptr->data;}
+		pointer operator->(void) const {return &this->ptr->data;}
 		bool check_endings(node *e){return (e == tNull);}
 		rbtree_iterator &operator++()
 		{
@@ -145,10 +145,108 @@ namespace ft
 
 		bool operator==(const rbtree_iterator &rhs) const {return this->ptr == rhs.ptr;}
 		bool operator!=(const rbtree_iterator &rhs) const {return this->ptr != rhs.ptr;}
-		operator rbtree_iterator<const T, Compare>() const {
-			return rbtree_iterator<const T, Compare>(ptr, tNull, min, max);}
-
 	};
+
+	template <class T>
+	class rbtree_const_iterator {
+	public:
+		typedef const ft::node<T> node;
+		typedef const T	value_type;
+		typedef typename iterator_traits<T>::size_type size_type;
+		typedef typename iterator_traits<T>::difference_type difference_type;
+		typedef const T* pointer;
+		typedef const T& reference;
+		typedef std::bidirectional_iterator_tag iterator_category;
+	private:
+		node *tNull;
+		node *min;
+		node *max;
+		node *ptr;
+	public:
+		rbtree_const_iterator(void){}
+		rbtree_const_iterator(node *ptr, node *tNull, node *min, node *max): tNull(tNull),min(min), max(max), ptr(ptr){}
+		rbtree_const_iterator(const rbtree_const_iterator &src): tNull(src.tNull), min(src.min), max(src.max), ptr(src.ptr){}
+
+		rbtree_const_iterator(const rbtree_iterator<T> &src):
+			tNull(src.null()), min(src.minptr()), max(src.maxptr()), ptr(src.base()) {}
+
+		~rbtree_const_iterator(){}
+		rbtree_const_iterator &operator=(const rbtree_const_iterator &rhs)
+		{
+			ptr = rhs.ptr;
+			tNull = rhs.tNull;
+			min = rhs.min;
+			max = rhs.max;
+			return *this;
+		}
+		node *base() const {return ptr;}
+		reference operator*(void) const {return this->ptr->data;}
+		pointer operator->(void) const {return &this->ptr->data;}
+		bool check_endings(node *e){return (e == tNull);}
+		rbtree_const_iterator &operator++()
+		{
+			if (ptr == NULL || check_endings(ptr))
+				ptr = min;
+			else if (!check_endings(ptr->right))
+			{
+				ptr = ptr->right;
+				while (!check_endings(ptr) && !check_endings(ptr->left))
+					ptr = ptr->left;
+			}
+			else
+			{
+				node *tmp;
+				tmp = ptr;
+				ptr = ptr->parent;
+				while (!check_endings(ptr) && tmp == ptr->right)
+				{
+					tmp = ptr;
+					ptr = ptr->parent;
+				}
+		}
+		return (*this);}
+		rbtree_const_iterator &operator--()
+		{
+			if (!ptr || check_endings(ptr))
+			ptr = max;
+			else if (!check_endings(ptr->left))
+			{
+				ptr = ptr->left;
+				while (!check_endings(ptr) && !check_endings(ptr->right))
+				{
+					ptr = ptr->right;
+				}
+			}
+			else
+			{
+				node *tmp;
+				tmp = ptr;
+				ptr = ptr->parent;
+				while (!check_endings(ptr) && tmp == ptr->left)
+				{
+					tmp = ptr;
+					ptr = ptr->parent;
+				}
+			}
+			return (*this);
+		}
+		rbtree_const_iterator operator++(int)
+		{
+			rbtree_const_iterator copy = *this;
+			++(*this);
+			return (copy);
+		}
+		rbtree_const_iterator operator--(int)
+		{
+			rbtree_const_iterator copy = *this;
+			--(*this);
+			return (copy);
+		}
+
+		bool operator==(const rbtree_const_iterator &rhs) const {return this->ptr == rhs.ptr;}
+		bool operator!=(const rbtree_const_iterator &rhs) const {return this->ptr != rhs.ptr;}
+	};
+
 	template <class T, class Compare, class Alloc = std::allocator<node<T> > >
 	class rbtree
 	{
@@ -162,8 +260,8 @@ namespace ft
 		typedef typename allocator_type::difference_type	difference_type;
 		typedef typename allocator_type::size_type			size_type;
 		typedef node<const T> *const_nodePtr;
-		typedef rbtree_iterator<T, Compare> iterator;
-		typedef rbtree_iterator<const T, Compare> const_iterator;
+		typedef rbtree_iterator<T> iterator;
+		typedef rbtree_const_iterator<T> const_iterator;
 		typedef ft::reverse_iterator<iterator> reverse_iterator;
 		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 	private:
@@ -173,7 +271,7 @@ namespace ft
 		Compare cmp;
 		allocator_type _alloc;
 	public:
-		explicit rbtree(const Compare &comp = Compare(), const allocator_type &alloc = allocator_type()) : length(0), cmp(comp), _alloc(alloc) 
+		explicit rbtree(const Compare &comp = Compare(), const allocator_type &alloc = allocator_type()) : length(0), cmp(comp), _alloc(alloc)
 		{
 			tNull =_alloc.allocate(1);
 			_alloc.construct(tNull, node<T>());

@@ -39,8 +39,8 @@ namespace ft{
 				typedef typename allocator_type::const_pointer const_pointer;
 				typedef typename allocator_type::difference_type difference_type;
 				typedef typename allocator_type::size_type size_type;
-				typedef rbtree_iterator<value_type, value_compare> iterator;
-				typedef rbtree_iterator<const value_type ,value_compare> const_iterator;
+				typedef rbtree_iterator<value_type> iterator;
+				typedef rbtree_const_iterator<value_type> const_iterator;
 				typedef ft::reverse_iterator<iterator> reverse_iterator;
 				typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -51,7 +51,7 @@ namespace ft{
 				static bool keys_equal(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2) {Compare comp; return !(comp(p1.first, p2.first) || comp(p2.first, p1.first));}
 				static bool key_gr_eq(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2) {Compare comp; return (!comp(p2.first, p1.first));}
 				static bool key_sm(const ft::pair<const Key, T> &p1, const ft::pair<const Key, T> &p2 ){Compare comp; return comp(p1.first, p2.first);}
-				
+
 			public:
 				explicit map (const key_compare& comp = key_compare(), const allocator_type& alloc = allocator_type()):comp(comp), _tree(value_compare(comp)), _alloc(alloc){}
 				template <class InputIterator>

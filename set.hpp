@@ -19,8 +19,8 @@ namespace ft
         typedef typename allocator_type::const_pointer const_pointer;
         typedef typename allocator_type::difference_type difference_type;
         typedef typename allocator_type::size_type size_type;
-        typedef rbtree_iterator<value_type, value_compare> iterator;
-        typedef rbtree_iterator<const value_type ,value_compare> const_iterator;
+        typedef rbtree_iterator<value_type> iterator;
+        typedef rbtree_const_iterator<value_type> const_iterator;
         typedef ft::reverse_iterator<iterator> reverse_iterator;
         typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
 
@@ -34,84 +34,39 @@ namespace ft
 		static bool key_sm(const T &p1, const T &p2 ){Compare comp; return comp(p1, p2);}
 				
 	public:
-		set(const Compare &comp = Compare())
-			: _tree(comp) {}
+		set(const Compare &comp = Compare()): _tree(comp) {}
 
 		template <typename InputIt>
-		set(InputIt first, InputIt last, const value_compare &comp = value_compare())
-			: _tree(first, last, comp) {}
+		set(InputIt first, InputIt last, const value_compare &comp = value_compare()): _tree(first, last, comp) {}
 
-		set(const _Self &o)
-			: _tree(o._tree) {}
+		set(const _Self &o) : _tree(o._tree) {}
 
 		~set() {}
 
-		_Self &operator=(const _Self &o)
-		{
-			_tree = o._tree;
-			return *this;
-		}
+		_Self &operator=(const _Self &o ){_tree = o._tree; return *this;}
 
-		iterator begin()
-		{
-			return _tree.begin();
-		}
+		iterator begin(){return _tree.begin();}
 
-		const_iterator begin() const
-		{
-			return _tree.begin();
-		}
+		const_iterator begin() const{return _tree.begin();}
 
-		iterator end()
-		{
-			return _tree.end();
-		}
+		iterator end(){return _tree.end();}
 
-		const_iterator end() const
-		{
-			return _tree.end();
-		}
+		const_iterator end() const{return _tree.end();}
 
-		reverse_iterator rbegin()
-		{
-			return _tree.rbegin();
-		}
+		reverse_iterator rbegin(){return _tree.rbegin();}
 
-		const_reverse_iterator rbegin() const
-		{
-			return _tree.rbegin();
-		}
+		const_reverse_iterator rbegin() const{return _tree.rbegin();}
 
-		reverse_iterator rend()
-		{
-			return _tree.rend();
-		}
+		reverse_iterator rend(){return _tree.rend();}
 
-		const_reverse_iterator rend() const
-		{
-			return _tree.rend();
-		}
+		const_reverse_iterator rend() const{return _tree.rend();}
 
-		bool empty() const
-		{
-			return _tree.empty();
-		}
+		bool empty() const{return _tree.empty();}
 
-		size_type size() const
-		{
-			return _tree.size();
-		}
+		size_type size() const{return _tree.size();}
 
-		size_type max_size() const
-		{
-			return std::numeric_limits<difference_type>::max() / (sizeof(ft::node<value_type>));
-			return _tree.max_size();
-		}
-
-		void clear()
-		{
-			_tree.clear();
-		}
+		size_type max_size() const	{return _tree.max_size();}
+		void clear(){_tree.clear();}
 
 		pair<iterator, bool> insert(const value_type &val)
 		{
@@ -121,21 +76,12 @@ namespace ft
 			return ft::make_pair<iterator, bool>(it, elementInserted);
 		}
 
-		iterator insert(iterator hint, const value_type &val)
-		{
-			return _tree.insert(hint, val);
-		}
+		iterator insert(iterator hint, const value_type &val){return _tree.insert(hint, val);}
 
 		template <typename InputIt>
-		void insert(InputIt first, InputIt last)
-		{
-			_tree.insert(first, last);
-		}
+		void insert(InputIt first, InputIt last){_tree.insert(first, last);}
 
-		void erase(iterator position)
-		{
-			_tree.erase(position);
-		}
+		void erase(iterator position){_tree.erase(position);}
 
 		size_type erase(const key_type &k)
 		{
@@ -147,15 +93,9 @@ namespace ft
 			return 1;
 		}
 
-		void erase(iterator first, iterator last)
-		{
-			_tree.erase(first, last);
-		}
+		void erase(iterator first, iterator last){_tree.erase(first, last);}
 
-		void swap(_Self &x)
-		{
-			ft::swap(_tree, x._tree);
-		}
+		void swap(_Self &x){ft::swap(_tree, x._tree);}
 		size_type count (const key_type& k) const {return _tree.countIf(keys_equal, k);}
 		iterator find (const key_type& k) {return _tree.find(keys_equal, k);}
 		const_iterator find (const key_type& k) const {return _tree.find(keys_equal, k);}
@@ -165,17 +105,8 @@ namespace ft
 		const_iterator upper_bound (const key_type& k) const {return _tree.find(key_sm, k);}
 		pair<const_iterator,const_iterator> equal_range (const key_type& k) const {return ft::make_pair<const_iterator, const_iterator>(lower_bound(k), upper_bound(k));}
 		pair<iterator,iterator> equal_range (const key_type& k) {return ft::make_pair<iterator, iterator>(lower_bound(k), upper_bound(k));}
-			
-
-		key_compare key_comp() const
-		{
-			return _tree.comparator()._cmp;
-		}
-
-		value_compare value_comp() const
-		{
-			return _tree.comparator();
-		}
+		key_compare key_comp() const{return key_compare();}
+		value_compare value_comp() const{return value_compare();}
 	};
 
 	template <typename T, typename Compare>

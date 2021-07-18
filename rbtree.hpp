@@ -394,6 +394,7 @@ namespace ft
 
 		void clear()
 		{
+			// erase(begin(), end());
 			while (!empty())
 				erase(begin());
 		}
@@ -624,7 +625,8 @@ namespace ft
 
 			y = toDelete;
 			color_type originalColor = toDelete->color;
-
+			// if (toDelete->left != tNull || toDelete->right != tNull)
+			// {
 			if (toDelete->left == tNull)
 			{
 				x = toDelete->right;
@@ -653,6 +655,7 @@ namespace ft
 				y->left->parent = y;
 				y->color = toDelete->color;
 			}
+			// }
 			_alloc.destroy(toDelete);
 			_alloc.deallocate(toDelete, 1);
 			length--;
@@ -662,6 +665,9 @@ namespace ft
 			void delete_check(nodePtr x)
 			{
 				nodePtr s;
+				if (x == tNull)
+					return ;
+			
 				while (x != _root && x->color == black)
 				{
 					if (x == x->parent->left)

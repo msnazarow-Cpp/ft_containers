@@ -173,7 +173,8 @@ namespace ft{
 				reserve(std::max(_size * 2, _size + n));
 				position = begin() + move;
 				for (iterator ptr = end() + n - 1; ptr >= position + n; ptr--)
-					*ptr = *(ptr - n);
+					_alloc.construct(ptr.base(), *(ptr - n));
+					//*ptr = *(ptr - n);
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
 					_alloc.construct(ptr.base(), val);
 				_size += n;
@@ -189,7 +190,8 @@ namespace ft{
 				for (iterator ptr = end() + n - 1; ptr >= position + n; ptr--)
 					*ptr = *(ptr - n);
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
-					*ptr = val;
+					_alloc.construct(ptr.base(), val);
+					//*ptr = val;
 				_size += n;
 			}
 			template <class InputIterator>
@@ -215,6 +217,7 @@ namespace ft{
 			}
 			void clear(){
 				erase(begin(),end());
+				_size = 0;
 			}
 			void resize (size_type n, value_type val = value_type())
 			{

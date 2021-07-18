@@ -12,6 +12,7 @@
 
 #pragma once
 #include "utils.hpp"
+#include "reverse_iterator.hpp"
 namespace ft
 {
 	typedef enum
@@ -30,11 +31,11 @@ namespace ft
 		T data;
 		color_type color;
 
-		node(void): left(NULL), right(NULL), parent(NULL), data(), color(black){}
+		node(void): parent(NULL), left(NULL), right(NULL), data(), color(black){}
 		node(const T &data, color_type color, node<T> *left = NULL, node<T> *right = NULL,
-				node<T> *parent = NULL): left(left), right(right), parent(parent), data(data), color(color){}
+				node<T> *parent = NULL): parent(parent), left(left), right(right), data(data), color(color){}
 		~node(){};
-		node(const node<T> &src): left(src.left), right(src.right), parent(src.parent), data(src.data), color(src.color){}
+		node(const node<T> &src): parent(src.parent), left(src.left), right(src.right), data(src.data), color(src.color){}
 		node<T> &operator=(const node<T> &rhs){
 			left = rhs.left;
 			right = rhs.right;
@@ -44,44 +45,51 @@ namespace ft
 			return (*this);}
 	};
 
-	template <class T, class Compare, bool allowDuplicates>
-	class RedBlackTreeIterator
+	template <class T, class Compare, class Alloc = std::allocator<T> >
+	class rbtree_iterator
 	{
+	public:
+		typedef ft::node<T> node;
+		typedef Alloc allocator_type;
+		typedef typename iterator_traits<T>::size_type size_type;
+		typedef typename iterator_traits<T>::difference_type difference_type;
+		typedef typename iterator_traits<T>::pointer pointer;
+		typedef typename iterator_traits<const T>::pointer const_pointer;
+		typedef typename iterator_traits<T>::reference reference;
+		typedef typename iterator_traits<T>::const_reference const_reference;
+		typedef std::bidirectional_iterator_tag iterator_category;
 	private:
 		node *tNull;
 		node *min;
 		node *max;
 		node *ptr;
 	public:
-		typedef ft::node<T> node;
-		typedef typename iterator_traits<T>::value_type value_type;
-		typedef typename iterator_traits<T>::difference_type difference_type;
-		typedef typename iterator_traits<T>::pointer pointer;
-		typedef typename iterator_traits<T>::reference reference;
-		typedef std::bidirectional_iterator_tag iterator_category;
-
-		RedBlackTreeIterator(void){}
-		RedBlackTreeIterator(node *ptr, node *tNull, node *min, node *max): ptr(ptr), tNull(tNull), min(min), max(max){}
-		RedBlackTreeIterator(const RedBlackTreeIterator &src): ptr(src.ptr), tNull(src.tNull), min(src.min), max(src.max){}
-		~RedBlackTreeIterator(){}
-		RedBlackTreeIterator &operator=(const RedBlackTreeIterator &rhs)
+		rbtree_iterator(void){}
+		rbtree_iterator(node *ptr, node *tNull, node *min, node *max): tNull(tNull),min(min), max(max), ptr(ptr){}
+		rbtree_iterator(const rbtree_iterator &src): tNull(src.tNull), min(src.min), max(src.max), ptr(src.ptr){}
+		~rbtree_iterator(){}
+		rbtree_iterator &operator=(const rbtree_iterator &rhs)
 		{
 			ptr = rhs.ptr;
 			tNull = rhs.tNull;
 			min = rhs.min;
 			max = rhs.max;
+			return *this;
 		}
-		reference operator*(void) const {return this->ptr->data;}
-		pointer operator->(void) const {return &this->ptr->data;}
-		bool isLeafNode(node *e){return (e == tNull);}
-		RedBlackTreeIterator &operator++()
+		node *base() const {return ptr;}
+		reference operator*(void) {return this->ptr->data;}
+		const_reference operator*(void) const {return this->ptr->data;}
+		const_pointer operator->(void) const {return &this->ptr->data;}
+		pointer operator->(void) {return &this->ptr->data;}
+		bool check_endings(node *e){return (e == tNull);}
+		rbtree_iterator &operator++()
 		{
-			if (ptr == NULL || isLeafNode(ptr))
+			if (ptr == NULL || check_endings(ptr))
 				ptr = min;
-			else if (!isLeafNode(ptr->right))
+			else if (!check_endings(ptr->right))
 			{
 				ptr = ptr->right;
-				while (!isLeafNode(ptr) && !isLeafNode(ptr->left))
+				while (!check_endings(ptr) && !check_endings(ptr->left))
 					ptr = ptr->left;
 			}
 			else
@@ -89,21 +97,21 @@ namespace ft
 				node *tmp;
 				tmp = ptr;
 				ptr = ptr->parent;
-				while (!isLeafNode(ptr) && tmp == ptr->right)
+				while (!check_endings(ptr) && tmp == ptr->right)
 				{
 					tmp = ptr;
 					ptr = ptr->parent;
 				}
 		}
 		return (*this);}
-		RedBlackTreeIterator &operator--()
+		rbtree_iterator &operator--()
 		{
-			if (!ptr || isLeafNode(ptr))
+			if (!ptr || check_endings(ptr))
 			ptr = max;
-			else if (!isLeafNode(ptr->left))
+			else if (!check_endings(ptr->left))
 			{
 				ptr = ptr->left;
-				while (!isLeafNode(ptr) && !isLeafNode(ptr->right))
+				while (!check_endings(ptr) && !check_endings(ptr->right))
 				{
 					ptr = ptr->right;
 				}
@@ -113,7 +121,7 @@ namespace ft
 				node *tmp;
 				tmp = ptr;
 				ptr = ptr->parent;
-				while (!isLeafNode(ptr) && tmp == ptr->left);
+				while (!check_endings(ptr) && tmp == ptr->left)
 				{
 					tmp = ptr;
 					ptr = ptr->parent;
@@ -121,81 +129,93 @@ namespace ft
 			}
 			return (*this);
 		}
-		RedBlackTreeIterator operator++(int)
+		rbtree_iterator operator++(int)
 		{
-			RedBlackTreeIterator copy = *this;
+			rbtree_iterator copy = *this;
 			++(*this);
 			return (copy);
 		}
-		RedBlackTreeIterator operator--(int)
+		rbtree_iterator operator--(int)
 		{
-			RedBlackTreeIterator copy = *this;
+			rbtree_iterator copy = *this;
 			--(*this);
 			return (copy);
 		}
 
-		bool operator==(const RedBlackTreeIterator &rhs) const {return this->ptr == rhs.ptr;}
-		bool operator!=(const RedBlackTreeIterator &rhs) const {return this->ptr != rhs.ptr;}
-
-
+		bool operator==(const rbtree_iterator &rhs) const {return this->ptr == rhs.ptr;}
+		bool operator!=(const rbtree_iterator &rhs) const {return this->ptr != rhs.ptr;}
+		operator rbtree_iterator<const T, Compare>() const {
+			return rbtree_iterator<const T, Compare>(ptr, tNull, min, max);}
 
 	};
-	template <class T, class Compare, bool allowDuplicates>
-	class RedBlackTree
+	template <class T, class Compare, class Alloc = std::allocator<node<T> > >
+	class rbtree
 	{
-	private:
-		nodePtr root;
-		nodePtr tNull;
-		size_t length;
-		Compare cmp;
 	public:
 		typedef node<T> *nodePtr;
+		typedef Alloc										allocator_type;
+		typedef typename allocator_type::reference			reference;
+		typedef typename allocator_type::const_reference	const_reference;
+		typedef typename allocator_type::pointer			pointer;
+		typedef typename allocator_type::const_pointer		const_pointer;
+		typedef typename allocator_type::difference_type	difference_type;
+		typedef typename allocator_type::size_type			size_type;
 		typedef node<const T> *const_nodePtr;
-		typedef RedBlackTreeIterator<T, Compare, allowDuplicates> iterator;
-		typedef RedBlackTreeIterator<const T, Compare, allowDuplicates> const_iterator;
-		typedef ReverseBiDirIter<iterator> reverse_iterator;
-		typedef ReverseBiDirIter<const_iterator> const_reverse_iterator;
-
-		explicit RedBlackTree(const Compare &comp = Compare()) : length(0), cmp(src.cmp)
+		typedef rbtree_iterator<T, Compare> iterator;
+		typedef rbtree_iterator<const T, Compare> const_iterator;
+		typedef ft::reverse_iterator<iterator> reverse_iterator;
+		typedef ft::reverse_iterator<const_iterator> const_reverse_iterator;
+	private:
+		nodePtr _root;
+		nodePtr tNull;
+		size_type length;
+		Compare cmp;
+		allocator_type _alloc;
+	public:
+		explicit rbtree(const Compare &comp = Compare(), const allocator_type &alloc = allocator_type()) : length(0), cmp(comp), _alloc(alloc) 
 		{
-			tNull = new TreeNode<T>;
-			root = tNull;
+			tNull =_alloc.allocate(1);
+			_alloc.construct(tNull, node<T>());
+			_root = tNull;
 		}
 		template <class InputIterator>
-		RedBlackTree(InputIterator first, InputIterator last, const Compare &comp = Compare()): length(0), cmp(src.cmp)
+		rbtree(InputIterator first, InputIterator last, const Compare &comp = Compare(), const allocator_type &alloc = allocator_type()): length(0), cmp(comp), _alloc(alloc)
 		{
-			tNull = new TreeNode<T>;
-			root = tNull;
+			tNull =_alloc.allocate(1);
+			_alloc.construct(tNull, node<T>());
+			_root = tNull;
 			insert(first, last);
 		}
-		RedBlackTree(const RedBlackTree &src): length(0), cmp(src.cmp)
+		rbtree(const rbtree &src): length(0), cmp(src.cmp)
 		{
-			tNull = new TreeNode<T>;
-			root = tNull;
-			deepCopy(src.root, src.tNull);
+			tNull =_alloc.allocate(1);
+			_alloc.construct(tNull, node<T>());
+			_root = tNull;
+			copy_branch(src._root, src.tNull);
 		}
-		~RedBlackTree()
+		~rbtree()
 		{
 			clear();
-			delete tNull;
+			_alloc.destroy(tNull);
+			_alloc.deallocate(tNull, 1);
 		}
-		RedBlackTree &operator=(const RedBlackTree &rhs)
+		rbtree &operator=(const rbtree &rhs)
 		{
 			if (this != &rhs)
 			{
 				clear();
-				deepCopy(rhs.root, rhs.tNull);
+				copy_branch(rhs._root, rhs.tNull);
 			}
 			return (*this);
 		}
 
 		iterator insert(const T &data)
 		{
-			return insertFrom(root, data);
+			return insert_data(_root, data);
 		}
 		iterator insert(iterator, const T &data)
 		{
-			return insertFrom(root, data);
+			return insert_data(_root, data);
 		}
 		template <class InputIterator>
 		void insert(InputIterator first, InputIterator last)
@@ -204,7 +224,7 @@ namespace ft
 				insert(*it);
 		}
 
-		void erase(iterator position) {return deleteNode(position.ptr);}
+		void erase(iterator position) {return delete_node(position.base());}
 		void erase(iterator first, iterator last)
 		{
 			iterator it = first;
@@ -212,19 +232,19 @@ namespace ft
 				erase(it++);
 		}
 		template <typename Predicate>
-		size_t eraseIf(Predicate pred, const T &data)
+		size_type eraseIf(Predicate pred, const T &data)
 		{
 			(void)pred;
 			nodePtr node;
-			size_t initalLength = size();
+			size_type initalLength = size();
 
-			node = this->root;
+			node = this->_root;
 			while (node && node != tNull)
 			{
 				if (pred(node->data, data))
 				{
-					deleteNode(node);
-					node = this->root;
+					delete_node(node);
+					node = this->_root;
 				}
 				else if (cmp(data, node->data))
 					node = node->left;
@@ -234,19 +254,19 @@ namespace ft
 			return initalLength - size();
 		}
 
-		void swap(RedBlackTree<T, Compare, allowDuplicates> &x)
+		void swap(rbtree<T, Compare> &x)
 		{
-		nodePtr tmp_root = root;
-		nodePtr tmp_tNull = tNull;
-		size_t tmp_length = size();
+			nodePtr tmp_root = _root;
+			nodePtr tmp_tNull = tNull;
+			size_type tmp_length = size();
 
-		root = x.root;
-		tNull = x.tNull;
-		length = x.length;
+			_root = x._root;
+			tNull = x.tNull;
+			length = x.length;
 
-		x.root = tmp_root;
-		x.tNull = tmp_tNull;
-		x.length = tmp_length;
+			x._root = tmp_root;
+			x.tNull = tmp_tNull;
+			x.length = tmp_length;
 		}
 
 		template <typename Predicate>
@@ -271,15 +291,13 @@ namespace ft
 		}
 
 		template <typename Predicate>
-		size_t countIf(Predicate pred, const T &data) const {return countIfRec(this->root, pred, data);}
+		size_type countIf(Predicate pred, const T &data) const {return countIfRec(this->_root, pred, data);}
 
 		void clear()
 		{
 			while (!empty())
 				erase(begin());
 		}
-
-		// Iterators
 
 		iterator begin()
 		{
@@ -316,14 +334,14 @@ namespace ft
 		// Capacity
 
 		bool empty() const {return (size() == 0);}
-		size_t size() const {return length;}
+		size_type size() const {return length;}
+		size_type max_size() const { return _alloc.max_size();}
 
-
-		nodePtr getParent(nodePtr n) {return n == NULL ? NULL : n->parent;}
-		nodePtr getGrandParent(nodePtr n){ return getParent(getParent(n));}
+		nodePtr get_parent(nodePtr n) {return n == NULL ? NULL : n->parent;}
+		nodePtr get_ded(nodePtr n){ return get_parent(get_parent(n));}
 		nodePtr getSibling(nodePtr n)
 		{
-			nodePtr parent = getParent(n);
+			nodePtr parent = get_parent(n);
 
 			if (!parent)
 				return NULL;
@@ -333,10 +351,10 @@ namespace ft
 
 			return parent->left;
 		}
-		nodePtr getUncle(nodePtr n) {return getSibling(getParent(n));}
+		nodePtr get_uncle(nodePtr n) {return getSibling(get_parent(n));}
 
-		nodePtr minimum() const {return minimum(this->root);}
-		nodePtr maximum() const {return maximum(this->root);}
+		nodePtr minimum() const {return minimum(this->_root);}
+		nodePtr maximum() const {return maximum(this->_root);}
 
 		nodePtr minimum(nodePtr n) const
 		{
@@ -355,23 +373,23 @@ namespace ft
 			return n;
 		}
 
-		void rotateLeft(nodePtr n)
+		void left(nodePtr x)
 		{
 			nodePtr y = x->right;
 			x->right = y->left;
 			if (y->left != tNull)
 				y->left->parent = x;
-			y->parent = getParent(x);
-			if (getParent(x) == NULL || getParent(x) == tNull)
-				root = y;
-			else if (x == getParent(x)->left)
-				getParent(x)->left = y;
+			y->parent = get_parent(x);
+			if (get_parent(x) == NULL || get_parent(x) == tNull)
+				_root = y;
+			else if (x == get_parent(x)->left)
+				get_parent(x)->left = y;
 			else
-				getParent(x)->right = y;
+				get_parent(x)->right = y;
 			y->left = x;
 			x->parent = y;
 		}
-		void rotateRight(nodePtr n)
+		void right(nodePtr x)
 		{
 			nodePtr y = x->left;
 			x->left = y->right;
@@ -379,262 +397,256 @@ namespace ft
 			if (y->right != tNull)
 				y->right->parent = x;
 			y->parent = x->parent;
-			if (getParent(x) == NULL || getParent(x) == tNull)
-				root = y;
-			else if (getParent(x)->right == x)
-				getParent(x)->right = y;
+			if (get_parent(x) == NULL || get_parent(x) == tNull)
+				_root = y;
+			else if (get_parent(x)->right == x)
+				get_parent(x)->right = y;
 			else
-				getParent(x)->left = y;
+				get_parent(x)->left = y;
 			y->right = x;
 			x->parent = y;
 		}
 
-		nodePtr createNewNodeToAdd(const T &data, nodePtr parent)
+		nodePtr make_node(const T &data, nodePtr parent)
 		{
 			length++;
-			return new node<T>(data, red, tNull, tNull, parent);
+			nodePtr out = _alloc.allocate(1);
+			_alloc.construct(out, node<T>(data, red, tNull, tNull, parent));
+			//return new node<T>(data, red, tNull, tNull, parent);
+			return out;
 		}
 
-		iterator insertFrom(nodePtr recRoot, const T &data)
+		iterator insert_data(nodePtr recRoot, const T &data)
 		{
-			iterator it = insertRecurse(recRoot, data);
+			iterator it = insert_fix(recRoot, data);
 
-			insertRepair(it.ptr);
+			insert_check(it.base());
 
-			recRoot = it.ptr;
-			while (getParent(recRoot) && getParent(recRoot) != tNull)
-				recRoot = getParent(recRoot);
+			recRoot = it.base();
+			while (get_parent(recRoot) && get_parent(recRoot) != tNull)
+				recRoot = get_parent(recRoot);
 
-			this->root = recRoot;
+			this->_root = recRoot;
 
 			return it;
 		}
-		iterator insertRecurse(nodePtr recRoot, const T &data)
+		iterator insert_fix(nodePtr recRoot, const T &data)
 		{
 			if (recRoot != NULL && recRoot != tNull)
 			{
 				if (cmp(data, recRoot->data))
 				{
 					if (recRoot->left != tNull)
-						return insertRecurse(recRoot->left, data);
+						return insert_fix(recRoot->left, data);
 					else
 					{
-						recRoot->left = createNewNodeToAdd(data, recRoot);
+						recRoot->left = make_node(data, recRoot);
 						return iterator(recRoot->left, tNull, minimum(), maximum());
 					}
 				}
-				else if (cmp(recRoot->data, data) || allowDuplicates)
+				else if (cmp(recRoot->data, data))
 				{
 					if (recRoot->right != tNull)
-						return insertRecurse(recRoot->right, data);
+						return insert_fix(recRoot->right, data);
 					else
 					{
-						recRoot->right = createNewNodeToAdd(data, recRoot);
+						recRoot->right = make_node(data, recRoot);
 						return iterator(recRoot->right, tNull, minimum(), maximum());
 					}
 				}
 				else
-				{
 					return iterator(recRoot, tNull, minimum(), maximum());
-				}
 			}
 			else
-				return iterator(createNewNodeToAdd(data, recRoot), tNull, minimum(), maximum());
+				return iterator(make_node(data, recRoot), tNull, minimum(), maximum());
 		}
-		void insertRepair(nodePtr n)
+		void insert_check(nodePtr n)
 		{
-			if (getParent(n) == NULL || getParent(n) == tNull)
-				insertCase1(n);
-			else if (getParent(n)->color == black)
-				insertCase2(n);
-			else if (getUncle(n) != NULL && getUncle(n)->color == red)
-				insertCase3(n);
+			if (get_parent(n) == NULL || get_parent(n) == tNull)
+				n->color = black;
+			else if (get_parent(n)->color == black)
+				return ;
+			else if (get_uncle(n) != NULL && get_uncle(n)->color == red)
+			{
+				get_parent(n)->color = black;
+				get_uncle(n)->color = black;
+				get_ded(n)->color = red;
+				insert_check(get_ded(n));
+			}
 			else
-				insertCase4(n);
+				insert_node(n);
 		}
-		void insertCase1(nodePtr n) {n->color = black;}
-		void insertCase2(nodePtr){}
-		void insertCase3(nodePtr n)
+		void insert_node(nodePtr n)
 		{
-			getParent(n)->color = black;
-			getUncle(n)->color = black;
-			getGrandParent(n)->color = red;
-			insertRepair(getGrandParent(n));
-		}
-		void insertCase4(nodePtr n)
-		{
-			nodePtr parent = getParent(n);
-			nodePtr grandParent = getGrandParent(n);
+			nodePtr parent = get_parent(n);
+			nodePtr grandParent = get_ded(n);
 
 			if (n == parent->right && parent == grandParent->left)
 			{
-				rotateLeft(parent);
+				left(parent);
 				n = n->left;
 			}
 			else if (n == parent->left && parent == grandParent->right)
 			{
-				rotateRight(parent);
+				right(parent);
 				n = n->right;
 			}
-			insertCase4Step2(n);
-		}
-		void insertCase4Step2(nodePtr n)
-		{
-			nodePtr parent = getParent(n);
-			nodePtr grandParent = getGrandParent(n);
+			parent = get_parent(n);
+			grandParent = get_ded(n);
 
 			if (n == parent->left)
-				rotateRight(grandParent);
+				right(grandParent);
 			else
-				rotateLeft(grandParent);
+				left(grandParent);
 
 			parent->color = black;
 			grandParent->color = red;
 		}
 
-		void replaceNode(nodePtr n, nodePtr child)
+		void replace_node(nodePtr u, nodePtr v)
 		{
 			if (u->parent == NULL || u->parent == tNull)
-				root = v;
-			else if (u == getParent(u)->left)
-				getParent(u)->left = v;
+				_root = v;
+			else if (u == get_parent(u)->left)
+				get_parent(u)->left = v;
 			else
-				getParent(u)->right = v;
+				get_parent(u)->right = v;
 
 			v->parent = u->parent;
 		}
 
-		void deleteNode(nodePtr node)
+		void delete_node(nodePtr node)
 		{
 			nodePtr x, y = NULL;
-		nodePtr toDelete = node;
+			nodePtr toDelete = node;
 
-		if (toDelete == NULL || toDelete == tNull)
-			return;
+			if (toDelete == NULL || toDelete == tNull)
+				return;
 
-		y = toDelete;
-		t_colors originalColor = toDelete->color;
+			y = toDelete;
+			color_type originalColor = toDelete->color;
 
-		if (toDelete->left == tNull)
-		{
-			x = toDelete->right;
-			replaceNode(toDelete, toDelete->right);
-		}
-		else if (toDelete->right == tNull)
-		{
-			x = toDelete->left;
-			replaceNode(toDelete, toDelete->left);
-		}
-		else
-		{
-			y = minimum(toDelete->right);
-			originalColor = y->color;
-			x = y->right;
-			if (getParent(y) == toDelete)
-				x->parent = y;
+			if (toDelete->left == tNull)
+			{
+				x = toDelete->right;
+				replace_node(toDelete, toDelete->right);
+			}
+			else if (toDelete->right == tNull)
+			{
+				x = toDelete->left;
+				replace_node(toDelete, toDelete->left);
+			}
 			else
 			{
-				replaceNode(y, y->right);
-				y->right = toDelete->right;
-				y->right->parent = y;
-			}
-			replaceNode(toDelete, y);
-			y->left = toDelete->left;
-			y->left->parent = y;
-			y->color = toDelete->color;
-		}
-		delete toDelete;
-		length--;
-		if (originalColor == black)
-			deleteFix(x);
-		}
-		void deleteFix(nodePtr x)
-		{
-			nodePtr s;
-			while (x != root && x->color == black)
-			{
-				if (x == x->parent->left)
+				y = minimum(toDelete->right);
+				originalColor = y->color;
+				x = y->right;
+				if (get_parent(y) == toDelete)
+					x->parent = y;
+				else
 				{
-					s = x->parent->right;
-					if (s->color == red)
+					replace_node(y, y->right);
+					y->right = toDelete->right;
+					y->right->parent = y;
+				}
+				replace_node(toDelete, y);
+				y->left = toDelete->left;
+				y->left->parent = y;
+				y->color = toDelete->color;
+			}
+			_alloc.destroy(toDelete);
+			_alloc.deallocate(toDelete, 1);
+			length--;
+			if (originalColor == black)
+				delete_check(x);
+			}
+			void delete_check(nodePtr x)
+			{
+				nodePtr s;
+				while (x != _root && x->color == black)
+				{
+					if (x == x->parent->left)
 					{
-						s->color = black;
-						x->parent->color = red;
-						rotateLeft(x->parent);
 						s = x->parent->right;
-					}
-
-					if (s->left->color == black && s->right->color == black)
-					{
-						s->color = red;
-						x = x->parent;
-					}
-					else
-					{
-						if (s->right->color == black)
+						if (s->color == red)
 						{
-							s->left->color = black;
-							s->color = red;
-							rotateRight(s);
+							s->color = black;
+							x->parent->color = red;
+							left(x->parent);
 							s = x->parent->right;
 						}
 
-						s->color = x->parent->color;
-						x->parent->color = black;
-						s->right->color = black;
-						rotateLeft(x->parent);
-						x = root;
-					}
-				}
-				else
-				{
-					s = x->parent->left;
-					if (s->color == red)
-					{
-						s->color = black;
-						x->parent->color = red;
-						rotateRight(x->parent);
-						s = x->parent->left;
-					}
+						if (s->left->color == black && s->right->color == black)
+						{
+							s->color = red;
+							x = x->parent;
+						}
+						else
+						{
+							if (s->right->color == black)
+							{
+								s->left->color = black;
+								s->color = red;
+								right(s);
+								s = x->parent->right;
+							}
 
-					if (s->right->color == black && s->right->color == black)
-					{
-						s->color = red;
-						x = x->parent;
+							s->color = x->parent->color;
+							x->parent->color = black;
+							s->right->color = black;
+							left(x->parent);
+							x = _root;
+						}
 					}
 					else
 					{
-						if (s->left->color == black)
+						s = x->parent->left;
+						if (s->color == red)
 						{
-							s->right->color = black;
-							s->color = red;
-							rotateLeft(s);
+							s->color = black;
+							x->parent->color = red;
+							right(x->parent);
 							s = x->parent->left;
 						}
 
-						s->color = x->parent->color;
-						x->parent->color = black;
-						s->left->color = black;
-						rotateRight(x->parent);
-						x = root;
+						if (s->right->color == black && s->right->color == black)
+						{
+							s->color = red;
+							x = x->parent;
+						}
+						else
+						{
+							if (s->left->color == black)
+							{
+								s->right->color = black;
+								s->color = red;
+								left(s);
+								s = x->parent->left;
+							}
+
+							s->color = x->parent->color;
+							x->parent->color = black;
+							s->left->color = black;
+							right(x->parent);
+							x = _root;
+						}
 					}
 				}
+				x->color = black;
 			}
-			x->color = black;
-		}
-			void deepCopy(nodePtr srcRoot, nodePtr srcTNull)
+			void copy_branch(nodePtr srcRoot, nodePtr srcTnull)
 			{
 				if (!srcRoot || srcRoot == srcTnull)
 					return;
-				deepCopy(srcRoot->left, srcTnull);
+				copy_branch(srcRoot->left, srcTnull);
 				insert(srcRoot->data);
-				deepCopy(srcRoot->right, srcTnull);
+				copy_branch(srcRoot->right, srcTnull);
 			}
 
 			template <typename Predicate>
-			size_t countIfRec(nodePtr recRoot, Predicate pred, const T &data) const`
+			size_type countIfRec(nodePtr recRoot, Predicate pred, const T &data) const
 			{
-				size_t count = 0;
+				size_type count = 0;
 				if (!recRoot || recRoot == tNull)
 					return 0;
 				count += countIfRec(recRoot->left, pred, data);
@@ -646,45 +658,4 @@ namespace ft
 			}
 
 		};
-
-		template <class T, class Compare, bool allowDuplicates>
-		template <class InputIterator>
-		RedBlackTree<T, Compare, allowDuplicates>::RedBlackTree(InputIterator first, InputIterator last, const Compare &comp) : length(0), cmp(comp)
-		{
-			tNull = new node<T>;
-			root = tNull;
-			insert(first, last);
-		}
-
-		template <class T, class Compare, bool allowDuplicates>
-		RedBlackTree<T, Compare, allowDuplicates>::RedBlackTree(const Compare &comp) : length(0), cmp(comp)
-		{
-			tNull = new node<T>;
-			root = tNull;
-		}
-
-		template <class T, class Compare, bool allowDuplicates>
-		RedBlackTree<T, Compare, allowDuplicates> &RedBlackTree<T, Compare, allowDuplicates>::operator=(const RedBlackTree &rhs)
-		{
-			if (this != &rhs)
-			{
-				clear();
-				deepCopy(rhs.root, rhs.tNull);
-			}
-			return (*this);
-		}
-
-		template <class T, class Compare, bool allowDuplicates>
-		RedBlackTree<T, Compare, allowDuplicates>::RedBlackTree(const RedBlackTree &src) : length(0), cmp(src.cmp)
-		{
-			tNull = new node<T>;
-			root = tNull;
-			deepCopy(src.root, src.tNull);
-		}
-
-		template <class T, class Compare, bool allowDuplicates>
-		void RedBlackTree<T, Compare, allowDuplicates>::deepCopy(nodePtr srcRoot, nodePtr srcTnull)
-		{
-
-		}
 }

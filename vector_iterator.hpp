@@ -1,18 +1,18 @@
 #pragma once
 #include <iterator>
-
+#include "utils.hpp"
 namespace ft
 {
 	template <class T, class Category = std::random_access_iterator_tag, class allocator_type = std::allocator<T> >
 	class vector_iterator{
 		public:
-		typedef T			value_type;
-		typedef T&		reference;
-		typedef const T&	const_reference;
-		typedef T*			pointer;
-		typedef const T*		const_pointer;
-	    typedef size_t      size_type;
-      	typedef std::ptrdiff_t   difference_type;
+		typedef typename ft::iterator_traits<T>::value_type			value_type;
+		typedef typename ft::iterator_traits<T>::reference			reference;
+		typedef typename ft::iterator_traits<T>::const_reference	const_reference;
+		typedef typename ft::iterator_traits<T>::pointer			pointer;
+		typedef typename ft::iterator_traits<T>::const_pointer		const_pointer;
+	    typedef typename ft::iterator_traits<T>::size_type			size_type;
+      	typedef typename ft::iterator_traits<T>::difference_type	difference_type;
 		typedef Category	iterator_category;
 		private:
 			pointer _ptr;

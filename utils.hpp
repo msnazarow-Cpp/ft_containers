@@ -1,5 +1,6 @@
 #pragma once
 #include <cstdlib>
+#include <iterator>
 namespace ft{
 template <class T>
 	struct less
@@ -82,15 +83,15 @@ template <class T>
 	}
 	template <class T1, class T2> struct pair
 	{
-		typedef T1 first_type;
-		typedef T2 second_type;
-		first_type first;
-		second_type second;
-		pair();
-		template<class U, class V> pair (const pair<U,V>& pr);
-		pair (const first_type& a, const second_type& b);
-		pair& operator= (const pair& pr);
-		
+		public:
+			typedef T1 first_type;
+			typedef T2 second_type;
+			first_type first;
+			second_type second;
+			pair(): first(T1()), second(T2()){}
+			template<class U, class V> pair (const pair<U,V>& pr): first(pr.first), second(pr.second){}
+			pair (const first_type& a, const second_type& b): first(a), second(b){}
+			pair& operator= (const pair& pr) {first = pr.first; second = pr.second; return *this;}
 	};
 	template <class T1, class T2>
 	bool operator== (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
@@ -113,34 +114,36 @@ template <class T>
 	{ return rhs<lhs; }
 
 	template <class T1, class T2>
-	bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs)
-	{ return !(lhs<rhs); }
-	template <class T1,class T2>
-	pair<T1,T2> make_pair (T1 x, T2 y)
-	{
-		return ( pair<T1,T2>(x,y) );
-	}
-	template <class Iterator>	struct iterator_traits {
-		typedef typename Iterator::difference_type		difference_type;
-		typedef typename Iterator::value_type			value_type;
-		typedef typename Iterator::pointer				pointer;
-		typedef typename Iterator::reference			reference;
-		typedef typename Iterator::iterator_category	iterator_category;
-	};
+	bool operator>= (const pair<T1,T2>& lhs, const pair<T1,T2>& rhs){ return !(lhs<rhs); }
 
-	template <class T>	struct iterator_traits<T*> {
+	template <class T1,class T2>
+		pair<T1,T2> make_pair (T1 x, T2 y)
+		{
+			return ( pair<T1,T2>(x,y) );
+		}
+	// template <class Iterator>	struct iterator_traits {
+	// 	typedef typename Iterator::difference_type		difference_type;
+	// 	typedef typename Iterator::value_type			value_type;
+	// 	typedef typename Iterator::pointer				pointer;
+	// 	typedef typename Iterator::reference			reference;
+	// 	typedef typename Iterator::iterator_category	iterator_category;
+	// };
+
+	// template <class T>	struct iterator_traits<T*> {
+	// 	typedef std::ptrdiff_t	difference_type;
+	// 	typedef T				value_type;
+	// 	typedef T*				pointer;
+	// 	typedef T&				reference;
+	// 	typedef std::random_access_iterator_tag	iterator_category;
+	// };
+
+	template <class T>	struct iterator_traits {
 		typedef std::ptrdiff_t	difference_type;
 		typedef T				value_type;
 		typedef T*				pointer;
+		typedef const T*		const_pointer;
 		typedef T&				reference;
-		typedef std::random_access_iterator_tag	iterator_category;
-	};
-
-	template <class T>	struct iterator_traits<const T*> {
-		typedef std::ptrdiff_t	difference_type;
-		typedef T				value_type;
-		typedef const T*		pointer;
-		typedef const T&		reference;
-		typedef std::random_access_iterator_tag	iterator_category;
+		typedef const T&		const_reference;
+		typedef size_t			size_type;
 	};
 }

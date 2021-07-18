@@ -1,5 +1,5 @@
 containers_test
 .vscode
 a.out
-main.cpp
+main*
 common.hpp

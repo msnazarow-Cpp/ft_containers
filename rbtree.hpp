@@ -1,15 +1,3 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   rbtree.hpp                                         :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: sgertrud <msnazarow@gmail.com>             +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/04/15 12:12:34 by adrien            #+#    #+#             */
-/*   Updated: 2021/07/16 16:00:09 by sgertrud         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #pragma once
 #include "utils.hpp"
 #include "reverse_iterator.hpp"
@@ -394,7 +382,6 @@ namespace ft
 
 		void clear()
 		{
-			// erase(begin(), end());
 			while (!empty())
 				erase(begin());
 		}
@@ -430,9 +417,6 @@ namespace ft
 
 		reverse_iterator rend() {return reverse_iterator(begin());}
 		const_reverse_iterator rend() const {return const_reverse_iterator(begin());}
-
-		// Capacity
-
 		bool empty() const {return (size() == 0);}
 		size_type size() const {return length;}
 		size_type max_size() const { return _alloc.max_size();}
@@ -512,7 +496,6 @@ namespace ft
 			length++;
 			nodePtr out = _alloc.allocate(1);
 			_alloc.construct(out, node<T>(data, red, tNull, tNull, parent));
-			//return new node<T>(data, red, tNull, tNull, parent);
 			return out;
 		}
 
@@ -625,8 +608,6 @@ namespace ft
 
 			y = toDelete;
 			color_type originalColor = toDelete->color;
-			// if (toDelete->left != tNull || toDelete->right != tNull)
-			// {
 			if (toDelete->left == tNull)
 			{
 				x = toDelete->right;
@@ -655,7 +636,6 @@ namespace ft
 				y->left->parent = y;
 				y->color = toDelete->color;
 			}
-			// }
 			_alloc.destroy(toDelete);
 			_alloc.deallocate(toDelete, 1);
 			length--;

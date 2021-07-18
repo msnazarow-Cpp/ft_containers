@@ -258,7 +258,6 @@ void set_check_string()
         ft_swap.clear();
         std_vec.clear();
         std::cout << "ft: " << ft_swap.empty()  << " | std: " << std_vec.empty() << std::endl;
-      //  std::cout << "ft: " << (ft_vec > ft_swap) << std::endl;
    }
 void stack_check_string()
     {

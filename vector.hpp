@@ -87,19 +87,19 @@ namespace ft{
 					_alloc.destroy(i.operator->());
 				for (iterator i = last; i != end(); i++ )
 				{
-					_alloc.construct((i - dist).operator->(), *i); // copy constructor
-					_alloc.destroy(i.operator->());					// call destructor
+					_alloc.construct((i - dist).operator->(), *i);  
+					_alloc.destroy(i.operator->());					
 				}
 				_size -= dist;
 				return first;
 			}
 			void reserve (size_type n)
 			{
-				if (n <= _capacity || n == 0) // no reallocation when not needed
+				if (n <= _capacity || n == 0)
 					return;
 				pointer _ptr = _alloc.allocate(n);
 				for (size_type i = 0; i < _size; i++){
-					_alloc.construct(_ptr + i, this->_ptr[i]); // call copy constructor		   // call destructor
+					_alloc.construct(_ptr + i, this->_ptr[i]); 
 				}
 				this->~ vector();
 				this->_ptr = _ptr;
@@ -174,7 +174,6 @@ namespace ft{
 				position = begin() + move;
 				for (iterator ptr = end() + n - 1; ptr >= position + n; ptr--)
 					_alloc.construct(ptr.base(), *(ptr - n));
-					//*ptr = *(ptr - n);
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
 					_alloc.construct(ptr.base(), val);
 				_size += n;
@@ -191,7 +190,6 @@ namespace ft{
 					*ptr = *(ptr - n);
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
 					_alloc.construct(ptr.base(), val);
-					//*ptr = val;
 				_size += n;
 			}
 			template <class InputIterator>

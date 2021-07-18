@@ -6,10 +6,10 @@
 #include "rbtree.hpp"
 #include <limits>
 namespace ft{
-	template < class Key,                                     // map::key_type
-			class T,                                       // map::mapped_type
-			class Compare = ft::less<Key>,                     // map::key_compare
-			class Alloc = std::allocator<ft::pair<const Key,T> >    // map::allocator_type
+	template < class Key,                                   
+			class T,                                      
+			class Compare = ft::less<Key>,                   
+			class Alloc = std::allocator<ft::pair<const Key,T> >
 			> class map
 			{
 			public:
@@ -22,7 +22,7 @@ namespace ft{
 					friend class map;
 					protected:
 					Compare comp;
-					value_compare (Compare c) : comp(c) {}  // constructed with map's comparison object
+					value_compare (Compare c) : comp(c) {} 
 					public:
 					typedef bool result_type;
 					typedef value_type first_argument_type;
@@ -73,7 +73,6 @@ namespace ft{
 				bool empty() const {return _tree.empty();}
 				size_type size() const {return _tree.size();}
 				size_type max_size() const {
-					//return std::numeric_limits<difference_type>::max() / (sizeof(ft::node<value_type>) );
 					return _tree.max_size();
 					}
 				mapped_type &operator[] (const key_type& k) { return ((insert(ft::make_pair<key_type, mapped_type>(k, mapped_type()))).first).base()->data.second;}

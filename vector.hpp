@@ -173,7 +173,10 @@ namespace ft{
 				reserve(std::max(_size * 2, _size + n));
 				position = begin() + move;
 				for (iterator ptr = end() + n - 1; ptr >= position + n; ptr--)
-					_alloc.construct(ptr.base(), *(ptr - n));
+					{
+						_alloc.construct(ptr.base(), *(ptr - n));
+						_alloc.destroy(ptr.base() - n);
+					}
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
 					_alloc.construct(ptr.base(), val);
 				_size += n;
@@ -187,24 +190,34 @@ namespace ft{
 				reserve(std::max(_size * 2, _size + n));
 				position = begin() + move;
 				for (iterator ptr = end() + n - 1; ptr >= position + n; ptr--)
-					*ptr = *(ptr - n);
+					{
+						_alloc.construct(ptr.base(), *(ptr - n));
+						_alloc.destroy(ptr.base() - n);
+					}
+					//*ptr = *(ptr - n);
 				for (iterator ptr = position + n - 1; ptr >= position; --ptr)
 					_alloc.construct(ptr.base(), val);
 				_size += n;
 			}
 			template <class InputIterator>
-			void insert (iterator position, InputIterator first, InputIterator last, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0){
+			void insert (iterator position, InputIterator f, InputIterator l, typename ft::enable_if<!ft::is_integral<InputIterator>::value>::type* = 0){
+				vector<T> vec(f, l);
+				iterator first = vec.begin();
+				iterator last = vec.end();
 				difference_type dist = 0;
 				difference_type pos = position - begin();
-				for (InputIterator i = first; i != last; i++)
+				for (iterator i = first; i != last; i++)
 					dist++;
 				if (_capacity < _size + dist)
 					reserve(std::max(_size * 2, _size + dist));
 				position = begin() + pos;
 				for (iterator ptr = _ptr + dist + _size - 1; ptr >= position + dist; ptr--)
-					*ptr = *(ptr - dist);
+					{
+						_alloc.construct(ptr.base(), *(ptr - dist));
+						_alloc.destroy(ptr.base() - dist);
+					}
 				for (iterator ptr = position ; ptr != position + dist; ptr++, first++)
-					*ptr = *first;
+					_alloc.construct(ptr.base(), *first);
 				_size += dist;
 			}
 			void swap(vector<T> & y){

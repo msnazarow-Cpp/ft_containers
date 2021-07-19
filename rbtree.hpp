@@ -83,8 +83,7 @@ namespace ft
 			}
 			else
 			{
-				node *tmp;
-				tmp = ptr;
+				node *tmp = ptr;
 				ptr = ptr->parent;
 				while (!check_endings(ptr) && tmp == ptr->right)
 				{
@@ -96,14 +95,12 @@ namespace ft
 		rbtree_iterator &operator--()
 		{
 			if (!ptr || check_endings(ptr))
-			ptr = max;
+				ptr = max;
 			else if (!check_endings(ptr->left))
 			{
 				ptr = ptr->left;
 				while (!check_endings(ptr) && !check_endings(ptr->right))
-				{
 					ptr = ptr->right;
-				}
 			}
 			else
 			{
@@ -201,9 +198,7 @@ namespace ft
 			{
 				ptr = ptr->left;
 				while (!check_endings(ptr) && !check_endings(ptr->right))
-				{
 					ptr = ptr->right;
-				}
 			}
 			else
 			{
@@ -321,7 +316,6 @@ namespace ft
 		template <typename Predicate>
 		size_type eraseIf(Predicate pred, const T &data)
 		{
-			(void)pred;
 			nodePtr node;
 			size_type initalLength = size();
 
@@ -360,20 +354,16 @@ namespace ft
 		iterator find(Predicate pred, const T &data)
 		{
 			for (iterator it = begin(); it != end(); it++)
-			{
 				if (pred(data, *it))
 					return it;
-			}
 			return end();
 		}
 		template <typename Predicate>
 		const_iterator find(Predicate pred, const T &data) const
 		{
 			for (const_iterator it = begin(); it != end(); it++)
-			{
 				if (pred(data, *it))
 					return it;
-			}
 			return end();
 		}
 
@@ -493,7 +483,7 @@ namespace ft
 
 		nodePtr make_node(const T &data, nodePtr parent)
 		{
-			length++;
+			++length;
 			nodePtr out = _alloc.allocate(1);
 			_alloc.construct(out, node<T>(data, red, tNull, tNull, parent));
 			return out;
@@ -502,15 +492,11 @@ namespace ft
 		iterator insert_data(nodePtr recRoot, const T &data)
 		{
 			iterator it = insert_fix(recRoot, data);
-
 			insert_check(it.base());
-
 			recRoot = it.base();
 			while (get_parent(recRoot) && get_parent(recRoot) != tNull)
 				recRoot = get_parent(recRoot);
-
 			this->_root = recRoot;
-
 			return it;
 		}
 		iterator insert_fix(nodePtr recRoot, const T &data)
@@ -563,7 +549,6 @@ namespace ft
 		{
 			nodePtr parent = get_parent(n);
 			nodePtr grandParent = get_ded(n);
-
 			if (n == parent->right && parent == grandParent->left)
 			{
 				left(parent);
@@ -576,12 +561,10 @@ namespace ft
 			}
 			parent = get_parent(n);
 			grandParent = get_ded(n);
-
 			if (n == parent->left)
 				right(grandParent);
 			else
 				left(grandParent);
-
 			parent->color = black;
 			grandParent->color = red;
 		}
@@ -594,50 +577,47 @@ namespace ft
 				get_parent(u)->left = v;
 			else
 				get_parent(u)->right = v;
-
 			v->parent = u->parent;
 		}
 
 		void delete_node(nodePtr node)
 		{
 			nodePtr x, y = NULL;
-			nodePtr toDelete = node;
-
-			if (toDelete == NULL || toDelete == tNull)
+			nodePtr removable = node;
+			if (removable == NULL || removable == tNull)
 				return;
-
-			y = toDelete;
-			color_type originalColor = toDelete->color;
-			if (toDelete->left == tNull)
+			y = removable;
+			color_type originalColor = removable->color;
+			if (removable->left == tNull)
 			{
-				x = toDelete->right;
-				replace_node(toDelete, toDelete->right);
+				x = removable->right;
+				replace_node(removable, removable->right);
 			}
-			else if (toDelete->right == tNull)
+			else if (removable->right == tNull)
 			{
-				x = toDelete->left;
-				replace_node(toDelete, toDelete->left);
+				x = removable->left;
+				replace_node(removable, removable->left);
 			}
 			else
 			{
-				y = minimum(toDelete->right);
+				y = minimum(removable->right);
 				originalColor = y->color;
 				x = y->right;
-				if (get_parent(y) == toDelete)
+				if (get_parent(y) == removable)
 					x->parent = y;
 				else
 				{
 					replace_node(y, y->right);
-					y->right = toDelete->right;
+					y->right = removable->right;
 					y->right->parent = y;
 				}
-				replace_node(toDelete, y);
-				y->left = toDelete->left;
+				replace_node(removable, y);
+				y->left = removable->left;
 				y->left->parent = y;
-				y->color = toDelete->color;
+				y->color = removable->color;
 			}
-			_alloc.destroy(toDelete);
-			_alloc.deallocate(toDelete, 1);
+			_alloc.destroy(removable);
+			_alloc.deallocate(removable, 1);
 			length--;
 			if (originalColor == black)
 				delete_check(x);
@@ -647,7 +627,7 @@ namespace ft
 				nodePtr s;
 				if (x == tNull)
 					return ;
-			
+		
 				while (x != _root && x->color == black)
 				{
 					if (x == x->parent->left)
@@ -660,7 +640,6 @@ namespace ft
 							left(x->parent);
 							s = x->parent->right;
 						}
-
 						if (s->left && s->right && s->left->color == black && s->right->color == black)
 						{
 							s->color = red;
@@ -675,7 +654,6 @@ namespace ft
 								right(s);
 								s = x->parent->right;
 							}
-
 							s->color = x->parent->color;
 							x->parent->color = black;
 							s->right->color = black;
@@ -693,7 +671,6 @@ namespace ft
 							right(x->parent);
 							s = x->parent->left;
 						}
-
 						if (s->right->color == black && s->right->color == black)
 						{
 							s->color = red;
@@ -708,7 +685,6 @@ namespace ft
 								left(s);
 								s = x->parent->left;
 							}
-
 							s->color = x->parent->color;
 							x->parent->color = black;
 							s->left->color = black;
@@ -736,11 +712,9 @@ namespace ft
 					return 0;
 				count += countIfRec(recRoot->left, pred, data);
 				count += countIfRec(recRoot->right, pred, data);
-
 				if (pred(data, recRoot->data))
 					count++;
 				return count;
 			}
-
 		};
 }
